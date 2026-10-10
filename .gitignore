@@ -1,0 +1,17 @@
+# Nix
+.nix-gc-roots
+result
+result-*
+
+# Verilator / C++ Build Artifacts
+hw/sim/build/
+*.o
+*.d
+*.a
+
+# Waveforms
+*.vcd
+*.fst
+
+# Rust / Cargo
+/target/
