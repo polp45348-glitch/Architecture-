@@ -1,0 +1,22 @@
+Architecture- : Open-Source AI SoC
+Copyright (c) 2026 polp45348-glitch and contributors
+
+This project is dual-licensed by component:
+
+  Hardware (everything under hw/):
+    CERN Open Hardware Licence Version 2 - Permissive
+    SPDX: CERN-OHL-P-2.0
+    Full text: LICENSES/CERN-OHL-P-2.0.txt
+
+  Software (everything under sw/ and all other files):
+    Apache License, Version 2.0
+    SPDX: Apache-2.0
+    Full text: LICENSES/Apache-2.0.txt
+
+Each source file should carry an SPDX header, e.g.
+  // SPDX-License-Identifier: CERN-OHL-P-2.0
+  // SPDX-License-Identifier: Apache-2.0
+
+Unless stated otherwise, contributions submitted to this
+project are licensed under the same terms as the part of
+the project they modify.
