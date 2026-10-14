@@ -7,37 +7,72 @@
 
   outputs = { self, nixpkgs }:
     let
-      system = "x86_64-linux";
-      pkgs = import nixpkgs { inherit system; };
+      systems = [ "x86_64-linux" "aarch64-linux" "aarch64-darwin" ];
+      forAllSystems = f: nixpkgs.lib.genAttrs systems (system: f nixpkgs.legacyPackages.${system});
     in
     {
-      devShells.${system}.default = pkgs.mkShell {
-        buildInputs = with pkgs; [
-          # Hardware Simulation & EDA
-          verilator
-          gtkwave
-          yosys
-          yosys-ghdl
-          
-          # Software & Compiler Infrastructure
-          rustc
-          cargo
-          llvmPackages_18.llvm
-          llvmPackages_18.mlir
-          clang-tools
-          cmake
-          
-          # Kernel Dev
-          flex
-          bison
-          elfutils
-        ];
+      devShells = forAllSystems (pkgs:
+        let
+          riscv = pkgs.pkgsCross.riscv32-embedded.buildPackages;
+        in
+        {
+          # Hardware: RTL, simulation, lint, RISC-V toolchain
+          # nix develop
+          default = pkgs.mkShell {
+            packages = with pkgs; [
+              verilator
+              iverilog
+              yosys
+              verible
+              gtkwave
+              surfer
+              gnumake
 
-        shellHook = ''
-          echo "=== Open-Source AI SoC Dev Environment Loaded ==="
-          echo "Verilator Version: $(verilator --version)"
-          echo "Rust Version: $(rustc --version)"
-        '';
-      };
+              (python313.withPackages (ps: with ps; [ cocotb pytest ]))
+
+              riscv.gcc
+              riscv.binutils
+            ];
+
+            shellHook = ''
+              echo "=== AI SoC: hardware shell ==="
+              echo "$(verilator --version)"
+            '';
+          };
+
+          # FPGA: synthesis -> place & route -> flash
+          # nix develop .#fpga
+          fpga = pkgs.mkShell {
+            inputsFrom = [ self.devShells.${pkgs.stdenv.hostPlatform.system}.default ];
+            packages = with pkgs; [
+              nextpnr
+              icestorm             # Lattice iCE40 (iCESugar, iCEBreaker)
+              trellis              # Lattice ECP5 (ULX3S)
+              python313Packages.apycula # Gowin (Tang Nano)
+              openfpgaloader
+            ];
+          };
+
+          # Software: compiler (Rust + LLVM/MLIR) and driver
+          # nix develop .#compiler
+          compiler = pkgs.mkShell {
+            packages = with pkgs; [
+              rustc
+              cargo
+              rustfmt
+              clippy
+              rust-analyzer
+
+              llvmPackages_18.llvm
+              llvmPackages_18.mlir
+              llvmPackages_18.clang-tools
+              cmake
+
+              flex
+              bison
+              elfutils
+            ];
+          };
+        });
     };
 }
