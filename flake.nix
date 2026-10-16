@@ -1,5 +1,5 @@
 {
-  description = "Open-Source AI SoC Hardware-Software Co-Design Lab";
+  description = "Lamp-AI: Open-Source AI SoC Hardware-Software Co-Design Lab";
 
   inputs = {
     nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
