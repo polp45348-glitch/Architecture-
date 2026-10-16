@@ -1,21 +1,23 @@
-// Testbench สำหรับ mac.v
-/* verilator lint_off BLKSEQ */
+// SPDX-License-Identifier: CERN-OHL-P-2.0
+// Testbench สำหรับ mac.sv
 // ป้อนค่าสุ่ม แล้วเทียบกับคำตอบที่คำนวณในซอฟต์แวร์
-`timescale 1ns/1ps
-module tb_mac;
-    logic               clk = 0;
-    logic               rst = 1;
-    logic               en  = 0;
-    logic signed [7:0]  a   = 0;
-    logic signed [7:0]  b   = 0;
+module mac_tb;
+    logic               clk;
+    logic               rst;
+    logic               en;
+    logic signed [7:0]  a;
+    logic signed [7:0]  b;
     logic signed [31:0] acc;
 
     mac dut (.clk(clk), .rst(rst), .en(en), .a(a), .b(b), .acc(acc));
 
-    always #5 clk = ~clk;   // นาฬิกา 100 MHz
+    initial begin           // นาฬิกา: สลับทุก 5 หน่วยเวลา
+        clk = 0;
+        forever #5 clk = ~clk;
+    end
 
-    longint expected = 0;
-    int errors = 0;
+    longint expected;
+    int errors;
 
     task automatic step(input logic signed [7:0] x, input logic signed [7:0] y);
         a = x; b = y; en = 1;
@@ -29,7 +31,8 @@ module tb_mac;
 
     initial begin
         $dumpfile("mac.vcd");   // ไฟล์คลื่นสำหรับเปิดใน GTKWave
-        $dumpvars(0, tb_mac);
+        $dumpvars(0, mac_tb);
+        rst = 1; en = 0; a = 0; b = 0; expected = 0; errors = 0;
 
         @(posedge clk); #1; rst = 0;
 

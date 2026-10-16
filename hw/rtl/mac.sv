@@ -1,4 +1,4 @@
-`timescale 1ns/1ps
+// SPDX-License-Identifier: CERN-OHL-P-2.0
 // MAC unit: multiply-accumulate, int8 x int8 -> int32
 // หัวใจของ NPU: ทุกจังหวะนาฬิกา เอา a*b ไปบวกสะสมใน acc
 module mac (
